@@ -21,7 +21,15 @@ class Webpage(models.Model):
     """
     name = models.CharField("Page name", max_length=20)
     link = models.CharField("Page link", max_length=200)
-    technologies = models.ManyToManyField(Technology)
+    technologies = models.ManyToManyField(Technology, blank=True)
+
+    def technologies_list(self):
+        rv = []
+
+        for tech in self.technologies.objects.all():
+            rv.append(tech.name)
+
+        return rv
 
     def __str__(self):
         return self.name
