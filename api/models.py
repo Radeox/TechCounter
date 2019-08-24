@@ -13,6 +13,9 @@ class Technology(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = "technologies"
+
 
 class Webpage(models.Model):
     """Model that represent a Webpage(name, link).
