@@ -3,7 +3,7 @@ from django.db import models
 
 class Technology(models.Model):
     """Model that represent a web technology
-    
+
     The regex will be used to check if a given page use that tech.
     """
     name = models.CharField("Technology name", max_length=20)
@@ -20,16 +20,8 @@ class Webpage(models.Model):
     (discoverd through regex matching).
     """
     name = models.CharField("Page name", max_length=20)
-    link = models.CharField("Page link", max_length=200)
+    url = models.CharField("Page URL", max_length=200, blank=False)
     technologies = models.ManyToManyField(Technology, blank=True)
-
-    def technologies_list(self):
-        rv = []
-
-        for tech in self.technologies.objects.all():
-            rv.append(tech.name)
-
-        return rv
 
     def __str__(self):
         return self.name

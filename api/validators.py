@@ -30,12 +30,17 @@ class PageChecker(Validation):
 
     def is_valid(self, bundle, request=None):
         for key, value in bundle.data.items():
-            if key == "link":
-                req = requests.get(value)
+            if key == "url":
+                try:
+                    req = requests.get(value)
 
-                if req.status_code == 200:
-                    error = False
-                else:
-                    error = True
+                    # Check page response
+                    if req.status_code == 200:
+                        error = False
+                    else:
+                        error = {"status": 400, "error": "Link return: {0}".format(req.status_code)}
+                except:
+                    # Could not parse the link
+                    error = {"status": 400, "error": "Invalid link"}
 
         return error
