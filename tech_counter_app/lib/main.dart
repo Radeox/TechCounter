@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tech_counter_app/tech_page.dart';
+import 'package:tech_counter_app/web_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -27,11 +29,12 @@ class _MyHomePageState extends State<MyHomePage> {
   // Index selected by the user
   int _selectedIndex = 0;
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text('Index 0: Home'),
-    Text('Index 1: Business'),
+  List<Widget> _widgetOptions = <Widget>[
+    WebPage(),
+    TechPage(),
     Text('Index 2: School'),
   ];
+
 
   void _onItemTapped(int index) {
     setState(() {
