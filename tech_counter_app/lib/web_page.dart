@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WebPage extends StatelessWidget {
   @override
@@ -36,7 +37,7 @@ class WebPage extends StatelessWidget {
   Future<List<Widget>> getList() async {
     // Result of the request to API
     Map result = {};
-    Map store = {};
+    Map names = await _getTechnologies();
     Response response;
 
     // Create an empty list
@@ -92,7 +93,7 @@ class WebPage extends StatelessWidget {
             String url = 'http://51.158.173.57:9000' + tech;
 
             // Check if the name was already loaded
-            if (store[url] == null) {
+            if (names[url] == null) {
               // Send the request
               response = await get(url);
 
@@ -102,10 +103,10 @@ class WebPage extends StatelessWidget {
 
               // Get the name and store it to avoid many requests
               name = result['name'];
-              store[url] = name;
+              names[url] = name;
             } else {
               // Retrive the stored name
-              name = store[url];
+              name = names[url];
             }
 
             // Add the name to the list
@@ -125,6 +126,28 @@ class WebPage extends StatelessWidget {
       );
     }
 
+    // Save the names for next runs
+    _setTechnologies(names);
+
     return list;
+  }
+
+  // Save the technologies names for faster loadings
+  _setTechnologies(Map technologies) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String techEncoded = json.encode(technologies);
+
+    await prefs.setString('technologies', techEncoded);
+  }
+
+  // Load the technologies names
+  _getTechnologies() async {
+    Map technologies = {};
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String techEncoded = prefs.getString('technologies');
+
+    if (techEncoded != null) technologies = json.decode(techEncoded);
+
+    return technologies;
   }
 }

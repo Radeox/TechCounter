@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TechPage extends StatelessWidget {
   @override
@@ -36,7 +37,13 @@ class TechPage extends StatelessWidget {
   Future<List<Widget>> getList() async {
     // Result of the request to API
     Map result = {};
-    Map store = {};
+
+    // Try to load techs from memory
+    Map names = await _getTechnologies();
+
+    // Map to count each tech
+    Map counters = {};
+
     Response response;
 
     // Create an empty list
@@ -83,38 +90,68 @@ class TechPage extends StatelessWidget {
             String url = 'http://51.158.173.57:9000' + tech;
 
             // Check if tech was already counted once
-            if (store[url] == null)
-              store[url] = 1;
+            if (counters[url] == null)
+              counters[url] = 1;
             else
-              store[url]++;
+              counters[url]++;
           }
         }
       }
     }
 
-    for (String url in store.keys) {
+    for (String url in counters.keys) {
       String name;
-      // Send the request
-      Response response = await get(url);
 
-      try {
-        result = json.decode(response.body);
-      } on Exception {}
+      if (names[url] == null) {
+        // Send the request
+        Response response = await get(url);
 
-      // Get the name and store it to avoid many requests
-      name = result['name'];
+        try {
+          result = json.decode(response.body);
+        } on Exception {}
+
+        // Get the name and store it to avoid many requests
+        name = result['name'];
+
+        // Put the new name in the names map
+        names[url] = name;
+      } else {
+        name = names[url];
+      }
 
       // Ceate the tile and add it
       list.add(
         Card(
           child: ListTile(
             title: Text(name),
-            subtitle: Text(store[url].toString()),
+            subtitle: Text(counters[url].toString()),
           ),
         ),
       );
     }
 
+    // Save the names for next runs
+    _setTechnologies(names);
+
     return list;
+  }
+
+  // Save the technologies names for faster loadings
+  _setTechnologies(Map technologies) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String techEncoded = json.encode(technologies);
+
+    await prefs.setString('technologies', techEncoded);
+  }
+
+  // Load the technologies names
+  _getTechnologies() async {
+    Map technologies = {};
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String techEncoded = prefs.getString('technologies');
+
+    if (techEncoded != null) technologies = json.decode(techEncoded);
+
+    return technologies;
   }
 }
