@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -36,6 +37,7 @@ class WebPage extends StatelessWidget {
     // Result of the request to API
     Map result = {};
     Map store = {};
+    Response response;
 
     // Create an empty list
     List<Widget> list = List();
@@ -44,7 +46,20 @@ class WebPage extends StatelessWidget {
     String url = 'http://51.158.173.57:9000/api/v1/webpage/?limit=0';
 
     // Send the request
-    Response response = await get(url);
+    try {
+      response = await get(url);
+    } on SocketException {
+      list.add(
+        Card(
+          child: ListTile(
+            title: Text("Network error"),
+            subtitle: Text("Can't connect to server."),
+          ),
+        ),
+      );
+
+      return list;
+    }
 
     // Try decoding results
     // If they are empty the result will not be a JSON
@@ -79,7 +94,20 @@ class WebPage extends StatelessWidget {
             // Check if the name was already loaded
             if (store[url] == null) {
               // Send the request
-              Response response = await get(url);
+     try {
+      response = await get(url);
+    } on SocketException {
+      list.add(
+        Card(
+          child: ListTile(
+            title: Text("Network error"),
+            subtitle: Text("Can't connect to server."),
+          ),
+        ),
+      );
+
+      return list;
+    }
 
               try {
                 result = json.decode(response.body);
@@ -100,12 +128,14 @@ class WebPage extends StatelessWidget {
       }
 
       // Ceate the tile and add it
-      list.add(Card(
-        child: ListTile(
-          title: Text(text),
-          subtitle: Text(subtext),
+      list.add(
+        Card(
+          child: ListTile(
+            title: Text(text),
+            subtitle: Text(subtext),
+          ),
         ),
-      ));
+      );
     }
 
     return list;
