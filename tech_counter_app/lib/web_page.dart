@@ -94,20 +94,7 @@ class WebPage extends StatelessWidget {
             // Check if the name was already loaded
             if (store[url] == null) {
               // Send the request
-     try {
-      response = await get(url);
-    } on SocketException {
-      list.add(
-        Card(
-          child: ListTile(
-            title: Text("Network error"),
-            subtitle: Text("Can't connect to server."),
-          ),
-        ),
-      );
-
-      return list;
-    }
+              response = await get(url);
 
               try {
                 result = json.decode(response.body);

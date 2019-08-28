@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tech_counter_app/add_page.dart';
 import 'package:tech_counter_app/tech_page.dart';
 import 'package:tech_counter_app/web_page.dart';
 
@@ -32,9 +33,8 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> _widgetOptions = <Widget>[
     WebPage(),
     TechPage(),
-    Text('Index 2: School'),
+    AddPage(),
   ];
-
 
   void _onItemTapped(int index) {
     setState(() {
